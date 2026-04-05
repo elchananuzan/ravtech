@@ -4,7 +4,7 @@
 
 const DAYS_HEB = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
-const SEFARIA_BASE = 'https://www.sefaria.org/api/v3/texts/';
+const SEFARIA_BASE = 'https://www.sefaria.org/api/texts/';
 
 // Sefaria API references for each day's portion
 // Each day can have multiple API calls (sections)
@@ -15,7 +15,7 @@ const WEEKLY_PORTIONS = [
     title: 'הקדמה - חלק א׳',
     subtitle: 'מהות הביטחון ומעלותיו',
     sefariaRefs: [
-      'Duties of the Heart, Fourth Treatise on Trust, Introduction 1-23'
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction.1-23'
     ],
     sections: [
       {
@@ -38,8 +38,8 @@ const WEEKLY_PORTIONS = [
     title: 'הקדמה חלק ב׳ + פרק א׳',
     subtitle: 'תנאי הביטחון והגדרתו',
     sefariaRefs: [
-      'Duties of the Heart, Fourth Treatise on Trust, Introduction 24-46',
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 1'
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction.24-46',
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1'
     ],
     sections: [
       {
@@ -67,8 +67,8 @@ const WEEKLY_PORTIONS = [
     title: 'פרקים ב׳-ג׳',
     subtitle: 'מדוע ה׳ ראוי לביטחון וחובת הביטחון',
     sefariaRefs: [
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 2',
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 3'
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2',
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3'
     ],
     sections: [
       {
@@ -97,7 +97,7 @@ const WEEKLY_PORTIONS = [
     title: 'פרק ד׳ - חלק א׳',
     subtitle: 'שבעה עניינים שצריך לבטוח בה׳ - ענייני עוה״ז',
     sefariaRefs: [
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 4 1-45'
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4.1-45'
     ],
     sections: [
       {
@@ -121,7 +121,7 @@ const WEEKLY_PORTIONS = [
     title: 'פרק ד׳ - חלק ב׳',
     subtitle: 'המשך שבעת העניינים - ענייני עוה״ב והשתדלות',
     sefariaRefs: [
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 4 46-99'
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4.46-99'
     ],
     sections: [
       {
@@ -146,8 +146,8 @@ const WEEKLY_PORTIONS = [
     title: 'פרקים ה׳-ו׳',
     subtitle: 'חיי הבוטח מול חיי מי שאינו בוטח',
     sefariaRefs: [
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 5',
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 6'
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5',
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6'
     ],
     sections: [
       {
@@ -178,7 +178,7 @@ const WEEKLY_PORTIONS = [
     title: 'פרק ז׳',
     subtitle: 'מכשולים בביטחון ועשר מדרגות הביטחון',
     sefariaRefs: [
-      'Duties of the Heart, Fourth Treatise on Trust, Chapter 7'
+      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7'
     ],
     sections: [
       {
@@ -225,24 +225,27 @@ async function fetchSefariaText(ref) {
   const cache = getTextCache();
   if (cache[ref]) return cache[ref];
 
-  const url = SEFARIA_BASE + encodeURIComponent(ref) + '?version=all';
+  // Use Sefaria v2 API - returns { he: [...], text: [...] }
+  const url = SEFARIA_BASE + ref + '?context=0&pad=0';
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    // Extract Hebrew text - handle both array and nested array formats
+    // v2 API returns Hebrew text in the "he" field
     let heTexts = [];
-    const heVersions = data.versions || [];
-    const heVersion = heVersions.find(v => v.language === 'he') || heVersions[0];
-
-    if (heVersion && heVersion.text) {
-      heTexts = flattenText(heVersion.text);
+    if (data.he) {
+      heTexts = flattenText(data.he);
     }
 
-    // Cache it
-    cache[ref] = heTexts;
-    saveTextCache(cache);
+    // Filter out empty strings
+    heTexts = heTexts.filter(t => t && t.trim().length > 0);
+
+    if (heTexts.length > 0) {
+      // Cache it
+      cache[ref] = heTexts;
+      saveTextCache(cache);
+    }
     return heTexts;
   } catch (err) {
     console.error(`Failed to fetch ${ref}:`, err);
