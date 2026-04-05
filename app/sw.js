@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shaar-habitachon-v1';
+const CACHE_NAME = 'shaar-habitachon-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -35,10 +35,24 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Daily notification scheduling
+// Message handler for notifications
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
     scheduleDaily(event.data.hour, event.data.minute);
+  }
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    self.registration.showNotification(event.data.title, {
+      body: event.data.body,
+      icon: 'icons/icon-192.png',
+      dir: 'rtl',
+      lang: 'he',
+      tag: 'daily-reminder',
+      renotify: true,
+      actions: [
+        { action: 'open', title: 'פתח ולמד' },
+        { action: 'snooze', title: 'הזכר לי אח״כ' }
+      ]
+    });
   }
 });
 
@@ -74,6 +88,23 @@ function getNotificationBody() {
 // Handle notification click
 self.addEventListener('notificationclick', event => {
   event.notification.close();
+
+  if (event.action === 'snooze') {
+    // Snooze: re-notify in 30 minutes
+    setTimeout(() => {
+      self.registration.showNotification('שער הביטחון - תזכורת!', {
+        body: getNotificationBody(),
+        icon: 'icons/icon-192.png',
+        dir: 'rtl',
+        lang: 'he',
+        tag: 'daily-reminder',
+        renotify: true
+      });
+    }, 30 * 60 * 1000);
+    return;
+  }
+
+  // Default: open the app
   event.waitUntil(
     self.clients.matchAll({ type: 'window' }).then(clients => {
       if (clients.length > 0) {

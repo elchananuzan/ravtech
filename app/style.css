@@ -632,6 +632,116 @@ input:checked + .slider::before {
   min-width: auto;
 }
 
+/* === Reminder Banner === */
+.reminder-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #3b2a0a, #2a1f05);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  animation: slideDown 0.4s ease, pulse-glow 3s ease-in-out infinite;
+  position: relative;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(226, 176, 74, 0.15); }
+  50% { box-shadow: 0 0 20px rgba(226, 176, 74, 0.3); }
+}
+
+.reminder-banner-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.reminder-banner-text {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.reminder-banner-text strong {
+  display: block;
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+
+.reminder-banner-text span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.reminder-banner-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+/* === Snooze === */
+.snooze-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.snooze-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.snooze-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-snooze {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-snooze:hover, .btn-snooze:active {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+}
+
+/* === Reminder Info Tip === */
+.reminder-info {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.reminder-tip {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
 /* === Scrollbar === */
 ::-webkit-scrollbar {
   width: 4px;

@@ -29,6 +29,16 @@
       <div class="week-counter" id="weekCounter"></div>
     </div>
 
+    <!-- Reminder Banner (shows when you haven't learned today) -->
+    <div class="reminder-banner" id="reminderBanner" style="display:none;">
+      <div class="reminder-banner-icon">📖</div>
+      <div class="reminder-banner-text">
+        <strong>עוד לא למדת היום!</strong>
+        <span id="reminderBannerMsg">הגיע הזמן ללמוד את החלק היומי</span>
+      </div>
+      <button class="reminder-banner-close" id="reminderBannerClose">&times;</button>
+    </div>
+
     <!-- Today's Portion -->
     <div class="today-card" id="todayCard" style="display:none;">
       <div class="today-badge">הלימוד של היום</div>
@@ -84,6 +94,19 @@
           <button class="btn btn-small" id="saveReminder">שמור</button>
         </div>
         <p class="reminder-status" id="reminderStatus"></p>
+        <div class="reminder-info" id="reminderInfo" style="display:none;">
+          <p class="reminder-tip">טיפ לאייפון: הוסף לעמוד הבית (Share > Add to Home Screen) כדי לקבל התראות אמיתיות</p>
+        </div>
+      </div>
+
+      <!-- Snooze Options -->
+      <div class="snooze-card" id="snoozeCard" style="display:none;">
+        <p>נדחה את הלימוד?</p>
+        <div class="snooze-buttons">
+          <button class="btn btn-small btn-snooze" data-minutes="30">עוד 30 דקות</button>
+          <button class="btn btn-small btn-snooze" data-minutes="60">עוד שעה</button>
+          <button class="btn btn-small btn-snooze" data-minutes="120">עוד שעתיים</button>
+        </div>
       </div>
     </div>
 

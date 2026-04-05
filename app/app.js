@@ -10,7 +10,9 @@ function getState() {
     lastLearnedDate: null,
     reminderEnabled: false,
     reminderHour: 8,
-    reminderMinute: 0
+    reminderMinute: 0,
+    snoozedUntil: 0,
+    lastNotifiedDate: null
   };
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -243,11 +245,140 @@ function showCelebration(count) {
   document.body.appendChild(overlay);
 }
 
-// === Reminders ===
+// === Reminder Banner ===
+function showReminderBanner(state) {
+  const banner = document.getElementById('reminderBanner');
+  const todayIdx = getTodayDayIndex();
+  const isDone = state.completedDays[getDayKey(todayIdx)];
+  const snoozedUntil = state.snoozedUntil || 0;
+  const now = Date.now();
+
+  // Show banner if: reminder enabled, not done today, not snoozed
+  if (state.reminderEnabled && !isDone && now > snoozedUntil) {
+    const portion = WEEKLY_PORTIONS[todayIdx];
+    document.getElementById('reminderBannerMsg').textContent =
+      `${portion.dayName} · ${portion.title}`;
+    banner.style.display = 'flex';
+
+    // Also show snooze options
+    document.getElementById('snoozeCard').style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+    document.getElementById('snoozeCard').style.display = 'none';
+  }
+}
+
+function setupBanner() {
+  // Close banner
+  document.getElementById('reminderBannerClose').addEventListener('click', () => {
+    document.getElementById('reminderBanner').style.display = 'none';
+  });
+
+  // Snooze buttons
+  document.querySelectorAll('.btn-snooze').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const minutes = parseInt(btn.dataset.minutes);
+      const s = getState();
+      s.snoozedUntil = Date.now() + (minutes * 60 * 1000);
+      saveState(s);
+      document.getElementById('reminderBanner').style.display = 'none';
+      document.getElementById('snoozeCard').style.display = 'none';
+
+      // Schedule a re-check after snooze expires
+      setTimeout(() => {
+        showReminderBanner(getState());
+        tryPushNotification();
+      }, minutes * 60 * 1000);
+    });
+  });
+}
+
+// === Push Notifications ===
+function tryPushNotification() {
+  const state = getState();
+  if (!state.reminderEnabled) return;
+
+  const todayIdx = getTodayDayIndex();
+  const isDone = state.completedDays[getDayKey(todayIdx)];
+  if (isDone) return;
+
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const portion = WEEKLY_PORTIONS[todayIdx];
+    // Use service worker for notification (works when app is in background on iOS PWA)
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SHOW_NOTIFICATION',
+        title: 'שער הביטחון - הגיע הזמן ללמוד!',
+        body: `${portion.dayName} · ${portion.title}`,
+      });
+    } else {
+      // Fallback: direct notification
+      new Notification('שער הביטחון - הגיע הזמן ללמוד!', {
+        body: `${portion.dayName} · ${portion.title}`,
+        dir: 'rtl',
+        lang: 'he',
+        tag: 'daily-reminder',
+        renotify: true
+      });
+    }
+  }
+}
+
+// === Periodic Reminder Check ===
+// Runs every minute while app is open; checks if it's reminder time
+function startReminderChecker() {
+  // Check immediately on load
+  checkReminderTime();
+
+  // Then check every 60 seconds
+  setInterval(checkReminderTime, 60 * 1000);
+}
+
+function checkReminderTime() {
+  const state = getState();
+  if (!state.reminderEnabled) return;
+
+  const now = new Date();
+  const currentH = now.getHours();
+  const currentM = now.getMinutes();
+
+  const todayIdx = getTodayDayIndex();
+  const isDone = state.completedDays[getDayKey(todayIdx)];
+  if (isDone) return;
+
+  // Check if it's past the reminder time and we haven't notified yet today
+  const reminderMinutes = state.reminderHour * 60 + state.reminderMinute;
+  const currentMinutes = currentH * 60 + currentM;
+  const today = getDateString();
+
+  if (currentMinutes >= reminderMinutes && state.lastNotifiedDate !== today) {
+    // Mark that we notified today
+    state.lastNotifiedDate = today;
+    saveState(state);
+
+    tryPushNotification();
+    showReminderBanner(state);
+  }
+}
+
+// === Visibility Change Handler ===
+// Re-check when user comes back to app (iOS suspends timers in background)
+function setupVisibilityHandler() {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      renderAll();
+      checkReminderTime();
+      showReminderBanner(getState());
+    }
+  });
+}
+
+// === Reminders Setup ===
 async function setupReminder() {
   const toggle = document.getElementById('reminderToggle');
   const timeSection = document.getElementById('reminderTimeSection');
   const statusEl = document.getElementById('reminderStatus');
+  const infoEl = document.getElementById('reminderInfo');
   const state = getState();
 
   toggle.checked = state.reminderEnabled;
@@ -258,6 +389,14 @@ async function setupReminder() {
     const m = String(state.reminderMinute).padStart(2, '0');
     document.getElementById('reminderTime').value = `${h}:${m}`;
     statusEl.textContent = `תזכורת מוגדרת לשעה ${h}:${m}`;
+  }
+
+  // Detect iOS and show tip
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone;
+  if (isIOS && !isStandalone) {
+    infoEl.style.display = 'block';
   }
 
   toggle.addEventListener('change', async () => {
@@ -271,13 +410,27 @@ async function setupReminder() {
           s.reminderEnabled = true;
           saveState(s);
           statusEl.textContent = 'תזכורת מופעלת! בחר שעה ולחץ שמור.';
-        } else {
+          showReminderBanner(s);
+        } else if (perm === 'denied') {
           toggle.checked = false;
-          statusEl.textContent = 'יש לאפשר התראות בהגדרות הדפדפן.';
+          statusEl.textContent = 'ההתראות חסומות. שנה בהגדרות הדפדפן.';
+        } else {
+          // "default" - still enable visual reminders
+          timeSection.style.display = 'flex';
+          const s = getState();
+          s.reminderEnabled = true;
+          saveState(s);
+          statusEl.textContent = 'תזכורת ויזואלית מופעלת (ללא התראות מערכת).';
+          showReminderBanner(s);
         }
       } else {
-        toggle.checked = false;
-        statusEl.textContent = 'הדפדפן לא תומך בהתראות.';
+        // No Notification API - still enable visual banner reminders
+        timeSection.style.display = 'flex';
+        const s = getState();
+        s.reminderEnabled = true;
+        saveState(s);
+        statusEl.textContent = 'תזכורת ויזואלית מופעלת.';
+        showReminderBanner(s);
       }
     } else {
       timeSection.style.display = 'none';
@@ -285,6 +438,8 @@ async function setupReminder() {
       s.reminderEnabled = false;
       saveState(s);
       statusEl.textContent = 'תזכורת כבויה.';
+      document.getElementById('reminderBanner').style.display = 'none';
+      document.getElementById('snoozeCard').style.display = 'none';
     }
   });
 
@@ -295,6 +450,7 @@ async function setupReminder() {
     s.reminderHour = h;
     s.reminderMinute = m;
     s.reminderEnabled = true;
+    s.lastNotifiedDate = null; // Reset so it can fire today if needed
     saveState(s);
 
     // Schedule via service worker
@@ -306,7 +462,12 @@ async function setupReminder() {
       });
     }
 
-    statusEl.textContent = `תזכורת נשמרה לשעה ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    statusEl.textContent = `תזכורת נשמרה לשעה ${timeStr}`;
+
+    // Check immediately if we're past the time
+    checkReminderTime();
+    showReminderBanner(getState());
   });
 }
 
@@ -327,13 +488,17 @@ function renderAll() {
   renderTodayCard(state);
   renderDaysList(state);
   renderStats(state);
+  showReminderBanner(state);
 }
 
 // === Init ===
 function init() {
   renderAll();
   setupReminder();
+  setupBanner();
   setupReset();
+  setupVisibilityHandler();
+  startReminderChecker();
 
   // Close detail overlay
   document.getElementById('closeDayDetail').addEventListener('click', closeDayDetail);
