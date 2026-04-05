@@ -481,6 +481,29 @@ function setupReset() {
   });
 }
 
+// === iOS Install Guide ===
+function showInstallGuide() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone;
+  const dismissed = localStorage.getItem('install-guide-dismissed');
+
+  // Show only on iOS Safari, not already installed, not dismissed
+  if (isIOS && !isStandalone && !dismissed) {
+    document.getElementById('installOverlay').style.display = 'flex';
+  }
+
+  document.getElementById('closeInstall').addEventListener('click', dismissInstallGuide);
+  document.getElementById('installDismiss').addEventListener('click', dismissInstallGuide);
+}
+
+function dismissInstallGuide() {
+  document.getElementById('installOverlay').style.display = 'none';
+  if (document.getElementById('installDontShow').checked) {
+    localStorage.setItem('install-guide-dismissed', 'true');
+  }
+}
+
 // === Render All ===
 function renderAll() {
   const state = getState();
@@ -499,6 +522,7 @@ function init() {
   setupReset();
   setupVisibilityHandler();
   startReminderChecker();
+  showInstallGuide();
 
   // Close detail overlay
   document.getElementById('closeDayDetail').addEventListener('click', closeDayDetail);

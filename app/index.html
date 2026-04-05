@@ -130,6 +130,35 @@
       <button class="btn btn-reset" id="resetBtn">אפס נתונים</button>
     </div>
 
+    <!-- iOS Install Guide -->
+    <div class="install-overlay" id="installOverlay" style="display:none;">
+      <div class="install-card">
+        <button class="close-btn" id="closeInstall">&times;</button>
+        <div class="install-icon">📲</div>
+        <h2>התקן את האפליקציה</h2>
+        <p>כדי לקבל תזכורות יומיות, יש להוסיף לעמוד הבית:</p>
+        <div class="install-steps">
+          <div class="install-step">
+            <span class="step-num">1</span>
+            <span>לחץ על כפתור <strong>השיתוף</strong> (⬆️) בתחתית Safari</span>
+          </div>
+          <div class="install-step">
+            <span class="step-num">2</span>
+            <span>גלול ולחץ על <strong>Add to Home Screen</strong></span>
+          </div>
+          <div class="install-step">
+            <span class="step-num">3</span>
+            <span>לחץ <strong>Add</strong> - האפליקציה תופיע בעמוד הבית!</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="installDismiss">הבנתי!</button>
+        <label class="install-dont-show">
+          <input type="checkbox" id="installDontShow">
+          <span>אל תציג שוב</span>
+        </label>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="app-footer">
       <p>בס״ד · חובות הלבבות לרבינו בחיי אבן פקודה</p>
