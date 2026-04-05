@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="שער הביטחון">
+  <meta name="theme-color" content="#16213e">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>שער הביטחון - לימוד יומי</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header">
+      <h1>שער הביטחון</h1>
+      <p class="subtitle">חובות הלבבות · סיום שבועי</p>
+    </header>
+
+    <!-- Weekly Progress -->
+    <div class="progress-section">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">0 / 7 ימים</div>
+      <div class="week-counter" id="weekCounter"></div>
+    </div>
+
+    <!-- Today's Portion -->
+    <div class="today-card" id="todayCard" style="display:none;">
+      <div class="today-badge">הלימוד של היום</div>
+      <h2 id="todayTitle"></h2>
+      <p class="today-subtitle" id="todaySubtitle"></p>
+      <div id="todayTopics"></div>
+      <div class="today-actions">
+        <a id="sefariaLink" href="#" target="_blank" rel="noopener" class="btn btn-primary">
+          📖 פתח בספריא
+        </a>
+        <button id="markDoneBtn" class="btn btn-success">
+          ✓ סיימתי את הלימוד
+        </button>
+      </div>
+    </div>
+
+    <!-- Daily Schedule -->
+    <div class="schedule-section">
+      <h2 class="section-title">לוח הלימוד השבועי</h2>
+      <div class="days-list" id="daysList"></div>
+    </div>
+
+    <!-- Expanded Day View -->
+    <div class="day-detail-overlay" id="dayDetailOverlay" style="display:none;">
+      <div class="day-detail-card">
+        <button class="close-btn" id="closeDayDetail">&times;</button>
+        <div id="dayDetailContent"></div>
+        <div class="day-detail-actions">
+          <a id="detailSefariaLink" href="#" target="_blank" rel="noopener" class="btn btn-primary">
+            📖 פתח בספריא
+          </a>
+          <button id="detailMarkDoneBtn" class="btn btn-success">
+            ✓ סיימתי
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reminder Settings -->
+    <div class="settings-section">
+      <h2 class="section-title">תזכורת יומית</h2>
+      <div class="reminder-card">
+        <div class="reminder-toggle">
+          <label class="switch">
+            <input type="checkbox" id="reminderToggle">
+            <span class="slider"></span>
+          </label>
+          <span>הפעל תזכורת יומית</span>
+        </div>
+        <div class="reminder-time" id="reminderTimeSection" style="display:none;">
+          <label for="reminderTime">שעת התזכורת:</label>
+          <input type="time" id="reminderTime" value="08:00">
+          <button class="btn btn-small" id="saveReminder">שמור</button>
+        </div>
+        <p class="reminder-status" id="reminderStatus"></p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-section">
+      <h2 class="section-title">הסטטיסטיקה שלי</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="totalCompletions">0</div>
+          <div class="stat-label">סיומים</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="currentStreak">0</div>
+          <div class="stat-label">ימים ברצף</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalDays">0</div>
+          <div class="stat-label">ימי לימוד</div>
+        </div>
+      </div>
+      <button class="btn btn-reset" id="resetBtn">אפס נתונים</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>בס״ד · חובות הלבבות לרבינו בחיי אבן פקודה</p>
+      <p class="footer-small">הטקסט מקושר לספריא · <a href="https://www.sefaria.org/Duties_of_the_Heart,_Fourth_Treatise_on_Trust" target="_blank" rel="noopener">ספריא</a></p>
+    </footer>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
