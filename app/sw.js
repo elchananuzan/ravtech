@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shaar-habitachon-v2';
+const CACHE_NAME = 'shaar-habitachon-v3';
 const urlsToCache = [
   './',
   './index.html',

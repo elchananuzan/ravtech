@@ -89,9 +89,6 @@ function renderTodayCard(state) {
     `<div class="topic-item"><span class="topic-bullet">◆</span>${t}</div>`
   ).join('');
 
-  // Sefaria link
-  document.getElementById('sefariaLink').href = portion.sefariaUrl;
-
   // Mark done button
   const btn = document.getElementById('markDoneBtn');
   if (isDone) {
