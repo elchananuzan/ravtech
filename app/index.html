@@ -46,12 +46,39 @@
       <p class="today-subtitle" id="todaySubtitle"></p>
       <div id="todayTopics"></div>
       <div class="today-actions">
-        <a id="sefariaLink" href="#" target="_blank" rel="noopener" class="btn btn-primary">
-          📖 פתח בספריא
-        </a>
+        <button id="readTextBtn" class="btn btn-primary">
+          📖 קרא את הטקסט
+        </button>
         <button id="markDoneBtn" class="btn btn-success">
           ✓ סיימתי את הלימוד
         </button>
+      </div>
+    </div>
+
+    <!-- Text Reader Overlay -->
+    <div class="reader-overlay" id="readerOverlay" style="display:none;">
+      <div class="reader-card">
+        <div class="reader-header">
+          <button class="close-btn" id="closeReader">&times;</button>
+          <h2 id="readerTitle"></h2>
+          <div class="reader-controls">
+            <button class="font-btn" id="fontSmaller">א-</button>
+            <button class="font-btn" id="fontBigger">א+</button>
+            <a id="readerSefariaLink" href="#" target="_blank" rel="noopener" class="font-btn">ספריא</a>
+          </div>
+        </div>
+        <div class="reader-content" id="readerContent">
+          <div class="reader-loading" id="readerLoading">טוען טקסט מספריא...</div>
+          <div class="reader-error" id="readerError" style="display:none;">
+            <p>לא הצלחנו לטעון את הטקסט.</p>
+            <button class="btn btn-small" id="retryFetch">נסה שוב</button>
+            <a id="fallbackSefariaLink" href="#" target="_blank" rel="noopener" class="btn btn-small">פתח בספריא</a>
+          </div>
+          <div class="reader-text" id="readerText" style="display:none;"></div>
+        </div>
+        <div class="reader-footer">
+          <button id="readerMarkDone" class="btn btn-success btn-full">✓ סיימתי את הלימוד</button>
+        </div>
       </div>
     </div>
 

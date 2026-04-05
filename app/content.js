@@ -4,13 +4,19 @@
 
 const DAYS_HEB = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
+const SEFARIA_BASE = 'https://www.sefaria.org/api/v3/texts/';
+
+// Sefaria API references for each day's portion
+// Each day can have multiple API calls (sections)
 const WEEKLY_PORTIONS = [
   {
     day: 1,
     dayName: 'יום ראשון',
     title: 'הקדמה - חלק א׳',
     subtitle: 'מהות הביטחון ומעלותיו',
-    sefariaRef: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction.1-23',
+    sefariaRefs: [
+      'Duties of the Heart, Fourth Treatise on Trust, Introduction 1-23'
+    ],
     sections: [
       {
         heading: 'פתיחה - למה שער הביטחון',
@@ -31,7 +37,10 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום שני',
     title: 'הקדמה חלק ב׳ + פרק א׳',
     subtitle: 'תנאי הביטחון והגדרתו',
-    sefariaRef: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction.24-46',
+    sefariaRefs: [
+      'Duties of the Heart, Fourth Treatise on Trust, Introduction 24-46',
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 1'
+    ],
     sections: [
       {
         heading: 'סיום ההקדמה',
@@ -57,7 +66,10 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום שלישי',
     title: 'פרקים ב׳-ג׳',
     subtitle: 'מדוע ה׳ ראוי לביטחון וחובת הביטחון',
-    sefariaRef: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2-3',
+    sefariaRefs: [
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 2',
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 3'
+    ],
     sections: [
       {
         heading: 'פרק ב׳ - שבע תכונות שבהן ה׳ ראוי לביטחון',
@@ -84,7 +96,9 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום רביעי',
     title: 'פרק ד׳ - חלק א׳',
     subtitle: 'שבעה עניינים שצריך לבטוח בה׳ - ענייני עוה״ז',
-    sefariaRef: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4.1-45',
+    sefariaRefs: [
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 4 1-45'
+    ],
     sections: [
       {
         heading: 'ענייני הגוף והפרנסה',
@@ -106,7 +120,9 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום חמישי',
     title: 'פרק ד׳ - חלק ב׳',
     subtitle: 'המשך שבעת העניינים - ענייני עוה״ב והשתדלות',
-    sefariaRef: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4.46-99',
+    sefariaRefs: [
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 4 46-99'
+    ],
     sections: [
       {
         heading: 'ענייני עולם הבא והשתדלות',
@@ -129,7 +145,10 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום שישי',
     title: 'פרקים ה׳-ו׳',
     subtitle: 'חיי הבוטח מול חיי מי שאינו בוטח',
-    sefariaRef: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5-6',
+    sefariaRefs: [
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 5',
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 6'
+    ],
     sections: [
       {
         heading: 'פרק ה׳ - שבע תכונות של הבוטח בה׳',
@@ -158,7 +177,9 @@ const WEEKLY_PORTIONS = [
     dayName: 'שבת',
     title: 'פרק ז׳',
     subtitle: 'מכשולים בביטחון ועשר מדרגות הביטחון',
-    sefariaRef: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7',
+    sefariaRefs: [
+      'Duties of the Heart, Fourth Treatise on Trust, Chapter 7'
+    ],
     sections: [
       {
         heading: 'פרק ז׳ - מכשולים ומדרגות',
@@ -177,3 +198,84 @@ const WEEKLY_PORTIONS = [
     sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_7.1?lang=he'
   }
 ];
+
+// === Sefaria Text Fetcher ===
+const TEXT_CACHE_KEY = 'shaar-habitachon-texts';
+const TEXT_CACHE_VERSION = 1;
+
+function getTextCache() {
+  try {
+    const cached = localStorage.getItem(TEXT_CACHE_KEY);
+    if (cached) {
+      const data = JSON.parse(cached);
+      if (data.version === TEXT_CACHE_VERSION) return data.texts;
+    }
+  } catch {}
+  return {};
+}
+
+function saveTextCache(texts) {
+  localStorage.setItem(TEXT_CACHE_KEY, JSON.stringify({
+    version: TEXT_CACHE_VERSION,
+    texts
+  }));
+}
+
+async function fetchSefariaText(ref) {
+  const cache = getTextCache();
+  if (cache[ref]) return cache[ref];
+
+  const url = SEFARIA_BASE + encodeURIComponent(ref) + '?version=all';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    // Extract Hebrew text - handle both array and nested array formats
+    let heTexts = [];
+    const heVersions = data.versions || [];
+    const heVersion = heVersions.find(v => v.language === 'he') || heVersions[0];
+
+    if (heVersion && heVersion.text) {
+      heTexts = flattenText(heVersion.text);
+    }
+
+    // Cache it
+    cache[ref] = heTexts;
+    saveTextCache(cache);
+    return heTexts;
+  } catch (err) {
+    console.error(`Failed to fetch ${ref}:`, err);
+    return null;
+  }
+}
+
+function flattenText(text) {
+  if (typeof text === 'string') return [text];
+  if (Array.isArray(text)) {
+    const result = [];
+    for (const item of text) {
+      if (typeof item === 'string') {
+        result.push(item);
+      } else if (Array.isArray(item)) {
+        result.push(...flattenText(item));
+      }
+    }
+    return result;
+  }
+  return [];
+}
+
+async function fetchDayTexts(dayIndex) {
+  const portion = WEEKLY_PORTIONS[dayIndex];
+  const allTexts = [];
+
+  for (const ref of portion.sefariaRefs) {
+    const texts = await fetchSefariaText(ref);
+    if (texts) {
+      allTexts.push(...texts);
+    }
+  }
+
+  return allTexts;
+}

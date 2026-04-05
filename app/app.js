@@ -165,7 +165,16 @@ function showDayDetail(dayIdx, state) {
     </div>
   `;
 
-  document.getElementById('detailSefariaLink').href = portion.sefariaUrl;
+  // Read text button in detail
+  const detailReadBtn = document.getElementById('detailSefariaLink');
+  detailReadBtn.href = '#';
+  detailReadBtn.textContent = '📖 קרא את הטקסט';
+  detailReadBtn.removeAttribute('target');
+  detailReadBtn.onclick = (e) => {
+    e.preventDefault();
+    closeDayDetail();
+    openReader(dayIdx);
+  };
 
   const btn = document.getElementById('detailMarkDoneBtn');
   if (isDone) {
@@ -481,6 +490,100 @@ function setupReset() {
   });
 }
 
+// === Text Reader ===
+let currentReaderDay = null;
+let readerFontSize = 1.15;
+
+async function openReader(dayIndex) {
+  currentReaderDay = dayIndex;
+  const portion = WEEKLY_PORTIONS[dayIndex];
+  const overlay = document.getElementById('readerOverlay');
+  const title = document.getElementById('readerTitle');
+  const loading = document.getElementById('readerLoading');
+  const error = document.getElementById('readerError');
+  const textEl = document.getElementById('readerText');
+
+  title.textContent = `${portion.dayName} · ${portion.title}`;
+  document.getElementById('readerSefariaLink').href = portion.sefariaUrl;
+  document.getElementById('fallbackSefariaLink').href = portion.sefariaUrl;
+
+  // Reset state
+  loading.style.display = 'block';
+  error.style.display = 'none';
+  textEl.style.display = 'none';
+  textEl.innerHTML = '';
+
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  // Fetch text
+  try {
+    const texts = await fetchDayTexts(dayIndex);
+    loading.style.display = 'none';
+
+    if (!texts || texts.length === 0) {
+      error.style.display = 'block';
+      return;
+    }
+
+    // Render segments
+    let html = '';
+    texts.forEach((seg, i) => {
+      // Clean HTML tags that Sefaria adds but keep basic formatting
+      const cleaned = seg
+        .replace(/<\/?(?:small|big|sup|sub)[^>]*>/gi, '')
+        .replace(/<br\s*\/?>/gi, '<br>');
+      html += `<div class="text-segment"><span class="seg-num">${i + 1}</span>${cleaned}</div>`;
+    });
+
+    textEl.innerHTML = html;
+    textEl.style.display = 'block';
+    textEl.style.fontSize = `${readerFontSize}rem`;
+  } catch (err) {
+    loading.style.display = 'none';
+    error.style.display = 'block';
+    console.error('Reader fetch error:', err);
+  }
+}
+
+function closeReader() {
+  document.getElementById('readerOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function setupReader() {
+  // Open reader from today card
+  document.getElementById('readTextBtn').addEventListener('click', () => {
+    openReader(getTodayDayIndex());
+  });
+
+  // Close reader
+  document.getElementById('closeReader').addEventListener('click', closeReader);
+
+  // Font size controls
+  document.getElementById('fontBigger').addEventListener('click', () => {
+    readerFontSize = Math.min(readerFontSize + 0.15, 2.5);
+    document.getElementById('readerText').style.fontSize = `${readerFontSize}rem`;
+  });
+  document.getElementById('fontSmaller').addEventListener('click', () => {
+    readerFontSize = Math.max(readerFontSize - 0.15, 0.7);
+    document.getElementById('readerText').style.fontSize = `${readerFontSize}rem`;
+  });
+
+  // Retry fetch
+  document.getElementById('retryFetch').addEventListener('click', () => {
+    if (currentReaderDay !== null) openReader(currentReaderDay);
+  });
+
+  // Mark done from reader
+  document.getElementById('readerMarkDone').addEventListener('click', () => {
+    if (currentReaderDay !== null) {
+      markDayComplete(currentReaderDay);
+      closeReader();
+    }
+  });
+}
+
 // === iOS Install Guide ===
 function showInstallGuide() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -517,6 +620,7 @@ function renderAll() {
 // === Init ===
 function init() {
   renderAll();
+  setupReader();
   setupReminder();
   setupBanner();
   setupReset();
