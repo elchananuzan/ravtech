@@ -7,7 +7,8 @@ const DAYS_HEB = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמיש�
 const SEFARIA_BASE = 'https://www.sefaria.org/api/texts/';
 
 // Sefaria API references for each day's portion
-// Each day can have multiple API calls (sections)
+// Each entry: { ref: "full chapter ref", from: start_segment (1-based), to: end_segment (inclusive) }
+// If from/to omitted, uses the entire chapter
 const WEEKLY_PORTIONS = [
   {
     day: 1,
@@ -15,7 +16,7 @@ const WEEKLY_PORTIONS = [
     title: 'הקדמה - חלק א׳',
     subtitle: 'מהות הביטחון ומעלותיו',
     sefariaRefs: [
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction.1-23'
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction', from: 1, to: 23 }
     ],
     sections: [
       {
@@ -38,8 +39,8 @@ const WEEKLY_PORTIONS = [
     title: 'הקדמה חלק ב׳ + פרק א׳',
     subtitle: 'תנאי הביטחון והגדרתו',
     sefariaRefs: [
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction.24-46',
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1'
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction', from: 24, to: 46 },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1' }
     ],
     sections: [
       {
@@ -67,8 +68,8 @@ const WEEKLY_PORTIONS = [
     title: 'פרקים ב׳-ג׳',
     subtitle: 'מדוע ה׳ ראוי לביטחון וחובת הביטחון',
     sefariaRefs: [
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2',
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3'
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2' },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3' }
     ],
     sections: [
       {
@@ -97,7 +98,7 @@ const WEEKLY_PORTIONS = [
     title: 'פרק ד׳ - חלק א׳',
     subtitle: 'שבעה עניינים שצריך לבטוח בה׳ - ענייני עוה״ז',
     sefariaRefs: [
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4.1-45'
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 1, to: 45 }
     ],
     sections: [
       {
@@ -121,7 +122,7 @@ const WEEKLY_PORTIONS = [
     title: 'פרק ד׳ - חלק ב׳',
     subtitle: 'המשך שבעת העניינים - ענייני עוה״ב והשתדלות',
     sefariaRefs: [
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4.46-99'
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 46, to: 99 }
     ],
     sections: [
       {
@@ -146,8 +147,8 @@ const WEEKLY_PORTIONS = [
     title: 'פרקים ה׳-ו׳',
     subtitle: 'חיי הבוטח מול חיי מי שאינו בוטח',
     sefariaRefs: [
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5',
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6'
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5' },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6' }
     ],
     sections: [
       {
@@ -178,7 +179,7 @@ const WEEKLY_PORTIONS = [
     title: 'פרק ז׳',
     subtitle: 'מכשולים בביטחון ועשר מדרגות הביטחון',
     sefariaRefs: [
-      'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7'
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7' }
     ],
     sections: [
       {
@@ -201,7 +202,7 @@ const WEEKLY_PORTIONS = [
 
 // === Sefaria Text Fetcher ===
 const TEXT_CACHE_KEY = 'shaar-habitachon-texts';
-const TEXT_CACHE_VERSION = 1;
+const TEXT_CACHE_VERSION = 2;
 
 function getTextCache() {
   try {
@@ -221,12 +222,12 @@ function saveTextCache(texts) {
   }));
 }
 
-async function fetchSefariaText(ref) {
+async function fetchSefariaChapter(chapterRef) {
   const cache = getTextCache();
-  if (cache[ref]) return cache[ref];
+  if (cache[chapterRef]) return cache[chapterRef];
 
   // Use Sefaria v2 API - returns { he: [...], text: [...] }
-  const url = SEFARIA_BASE + ref + '?context=0&pad=0';
+  const url = SEFARIA_BASE + chapterRef + '?context=0&pad=0';
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -242,13 +243,12 @@ async function fetchSefariaText(ref) {
     heTexts = heTexts.filter(t => t && t.trim().length > 0);
 
     if (heTexts.length > 0) {
-      // Cache it
-      cache[ref] = heTexts;
+      cache[chapterRef] = heTexts;
       saveTextCache(cache);
     }
     return heTexts;
   } catch (err) {
-    console.error(`Failed to fetch ${ref}:`, err);
+    console.error(`Failed to fetch ${chapterRef}:`, err);
     return null;
   }
 }
@@ -273,10 +273,18 @@ async function fetchDayTexts(dayIndex) {
   const portion = WEEKLY_PORTIONS[dayIndex];
   const allTexts = [];
 
-  for (const ref of portion.sefariaRefs) {
-    const texts = await fetchSefariaText(ref);
+  for (const entry of portion.sefariaRefs) {
+    const chapterRef = entry.ref;
+    const texts = await fetchSefariaChapter(chapterRef);
     if (texts) {
-      allTexts.push(...texts);
+      // Slice to the specific segment range if specified
+      if (entry.from && entry.to) {
+        // from/to are 1-based, array is 0-based
+        const sliced = texts.slice(entry.from - 1, entry.to);
+        allTexts.push(...sliced);
+      } else {
+        allTexts.push(...texts);
+      }
     }
   }
 
