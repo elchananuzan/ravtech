@@ -6,9 +6,11 @@ const DAYS_HEB = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמיש�
 
 const SEFARIA_BASE = 'https://www.sefaria.org/api/texts/';
 
-// Sefaria API references for each day's portion
-// Each entry: { ref: "full chapter ref", from: start_segment (1-based), to: end_segment (inclusive) }
-// If from/to omitted, uses the entire chapter
+// Sefaria API references for each day's portion.
+// Each entry is { ref, from?, to? }:
+//   - ref: Sefaria reference string (fetched as full chapter)
+//   - from/to: 1-based segment range to slice locally (inclusive)
+//   If from/to omitted, the entire chapter is used.
 const WEEKLY_PORTIONS = [
   {
     day: 1,
@@ -39,14 +41,14 @@ const WEEKLY_PORTIONS = [
     title: 'הקדמה חלק ב׳ + פרק א׳',
     subtitle: 'תנאי הביטחון והגדרתו',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction', from: 24, to: 46 },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction', from: 24 },
       { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1' }
     ],
     sections: [
       {
         heading: 'סיום ההקדמה',
         description: 'המשך ההקדמה - תיאור שבעת פרקי השער ותוכנם.',
-        segments: 'הקדמה כ״ד-מ״ו'
+        segments: 'הקדמה כ״ד-סוף'
       },
       {
         heading: 'פרק א׳ - הגדרת הביטחון',
@@ -122,13 +124,13 @@ const WEEKLY_PORTIONS = [
     title: 'פרק ד׳ - חלק ב׳',
     subtitle: 'המשך שבעת העניינים - ענייני עוה״ב והשתדלות',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 46, to: 99 }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 46 }
     ],
     sections: [
       {
         heading: 'ענייני עולם הבא והשתדלות',
         description: 'ביטחון בענייני חברה, אמונה במצוות, שכר ועונש, הכרת חסדי ה׳. דיון נרחב בהשתדלות מול ביטחון.',
-        segments: 'פרק ד׳ מ״ו-צ״ט'
+        segments: 'פרק ד׳ מ״ו-סוף'
       }
     ],
     topics: [
@@ -202,7 +204,7 @@ const WEEKLY_PORTIONS = [
 
 // === Sefaria Text Fetcher ===
 const TEXT_CACHE_KEY = 'shaar-habitachon-texts';
-const TEXT_CACHE_VERSION = 2;
+const TEXT_CACHE_VERSION = 3; // bumped to invalidate old cache after slicing fix
 
 function getTextCache() {
   try {
@@ -216,39 +218,39 @@ function getTextCache() {
 }
 
 function saveTextCache(texts) {
-  localStorage.setItem(TEXT_CACHE_KEY, JSON.stringify({
-    version: TEXT_CACHE_VERSION,
-    texts
-  }));
+  try {
+    localStorage.setItem(TEXT_CACHE_KEY, JSON.stringify({
+      version: TEXT_CACHE_VERSION,
+      texts
+    }));
+  } catch {}
 }
 
-async function fetchSefariaChapter(chapterRef) {
+// Fetches a full Sefaria chapter (all segments) as a flat array of Hebrew strings.
+async function fetchSefariaChapter(ref) {
   const cache = getTextCache();
-  if (cache[chapterRef]) return cache[chapterRef];
+  if (cache[ref]) return cache[ref];
 
-  // Use Sefaria v2 API - returns { he: [...], text: [...] }
-  const url = SEFARIA_BASE + chapterRef + '?context=0&pad=0';
+  // Sefaria v2 API - returns { he: [...], text: [...] }
+  const url = SEFARIA_BASE + ref + '?context=0&pad=0';
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    // v2 API returns Hebrew text in the "he" field
     let heTexts = [];
     if (data.he) {
       heTexts = flattenText(data.he);
     }
 
-    // Filter out empty strings
-    heTexts = heTexts.filter(t => t && t.trim().length > 0);
-
+    // Do NOT filter empty strings here - we need to preserve indices for slicing.
     if (heTexts.length > 0) {
-      cache[chapterRef] = heTexts;
+      cache[ref] = heTexts;
       saveTextCache(cache);
     }
     return heTexts;
   } catch (err) {
-    console.error(`Failed to fetch ${chapterRef}:`, err);
+    console.error(`Failed to fetch ${ref}:`, err);
     return null;
   }
 }
@@ -269,23 +271,32 @@ function flattenText(text) {
   return [];
 }
 
+// Fetch all texts for a given day, slicing ranges locally from the full chapter.
 async function fetchDayTexts(dayIndex) {
   const portion = WEEKLY_PORTIONS[dayIndex];
   const allTexts = [];
 
   for (const entry of portion.sefariaRefs) {
-    const chapterRef = entry.ref;
-    const texts = await fetchSefariaChapter(chapterRef);
-    if (texts) {
-      // Slice to the specific segment range if specified
-      if (entry.from && entry.to) {
-        // from/to are 1-based, array is 0-based
-        const sliced = texts.slice(entry.from - 1, entry.to);
-        allTexts.push(...sliced);
-      } else {
-        allTexts.push(...texts);
-      }
+    // Support both old-style strings and new-style { ref, from, to } objects.
+    const ref = typeof entry === 'string' ? entry : entry.ref;
+    const from = typeof entry === 'object' ? entry.from : undefined;
+    const to = typeof entry === 'object' ? entry.to : undefined;
+
+    const chapter = await fetchSefariaChapter(ref);
+    if (!chapter) continue;
+
+    let slice;
+    if (from !== undefined || to !== undefined) {
+      const start = (from || 1) - 1; // 1-based → 0-based
+      const end = to !== undefined ? to : chapter.length;
+      slice = chapter.slice(start, end);
+    } else {
+      slice = chapter;
     }
+
+    // Filter empties only after slicing so ranges stay aligned.
+    slice = slice.filter(t => t && t.trim && t.trim().length > 0);
+    allTexts.push(...slice);
   }
 
   return allTexts;
