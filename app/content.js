@@ -67,22 +67,16 @@ const WEEKLY_PORTIONS = [
   {
     day: 3,
     dayName: 'יום שלישי',
-    title: 'פרקים ב׳-ג׳',
-    subtitle: 'מדוע ה׳ ראוי לביטחון וחובת הביטחון',
+    title: 'פרק ב׳',
+    subtitle: 'שבע תכונות שבהן ה׳ ראוי לביטחון',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2' },
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3' }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2' }
     ],
     sections: [
       {
-        heading: 'פרק ב׳ - שבע תכונות שבהן ה׳ ראוי לביטחון',
+        heading: 'פרק ב׳ - מדוע ה׳ ראוי לביטחון',
         description: 'הוכחות מהתורה שהקב״ה מקיים את כל ששת התנאים שנמנו בפרק א׳, ועוד יותר מכך.',
-        segments: 'פרק ב׳'
-      },
-      {
-        heading: 'פרק ג׳ - חמישה דברים המחייבים ביטחון בה׳',
-        description: 'חמישה יסודות: הכרת חסדי ה׳, ידיעתו את מחשבותינו, ביטחון אמיתי, שילוב אמונה עם עבודה, והשתדלות מול ביטחון.',
-        segments: 'פרק ג׳'
+        segments: 'פרק ב׳ (מלא)'
       }
     ],
     topics: [
@@ -90,121 +84,129 @@ const WEEKLY_PORTIONS = [
       'כוחו ית׳ וידיעתו',
       'שליטתו המוחלטת',
       'חסדו אף למי שאינו ראוי',
-      'חמישה יסודות המחייבים ביטחון'
+      'הסיבה העליונה לכל דבר'
     ],
     sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_2.1?lang=he'
   },
   {
     day: 4,
     dayName: 'יום רביעי',
-    title: 'פרק ד׳ - חלק א׳',
-    subtitle: 'שבעה עניינים שצריך לבטוח בה׳ - ענייני עוה״ז',
+    title: 'פרק ג׳ + תחילת פרק ד׳',
+    subtitle: 'חובת הביטחון ופתיחת שבעת העניינים',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 1, to: 45 }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3' },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 1, to: 25 }
     ],
     sections: [
       {
-        heading: 'ענייני הגוף והפרנסה',
-        description: 'ביטחון בענייני בריאות הגוף, פרנסה ועניינים גשמיים. דיון מעמיק ביחס בין השתדלות לביטחון.',
-        segments: 'פרק ד׳ א׳-מ״ה'
+        heading: 'פרק ג׳ - חמישה דברים המחייבים ביטחון בה׳',
+        description: 'חמישה יסודות: הכרת חסדי ה׳, ידיעתו את מחשבותינו, ביטחון אמיתי, שילוב אמונה עם עבודה, והשתדלות מול ביטחון.',
+        segments: 'פרק ג׳ (מלא)'
+      },
+      {
+        heading: 'פתיחת פרק ד׳ - ענייני הגוף',
+        description: 'התחלת שבעת העניינים שצריך לבטוח בה׳ - ביטחון בענייני בריאות הגוף וחיי האדם.',
+        segments: 'פרק ד׳ א׳-כ״ה'
       }
     ],
     topics: [
-      'ביטחון בענייני הגוף',
-      'ביטחון בפרנסה',
-      'ביטחון בענייני משפחה',
-      'היחס בין השתדלות לביטחון',
-      'סוגי ההשתדלות המותרים'
+      'חמישה יסודות המחייבים ביטחון',
+      'הכרת חסדי ה׳',
+      'ידיעתו את המחשבות',
+      'פתיחת שבעת העניינים',
+      'ביטחון בענייני הגוף'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.1?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_3.1?lang=he'
   },
   {
     day: 5,
     dayName: 'יום חמישי',
     title: 'פרק ד׳ - חלק ב׳',
-    subtitle: 'המשך שבעת העניינים - ענייני עוה״ב והשתדלות',
+    subtitle: 'המשך ענייני הגוף והפרנסה',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 46 }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 26, to: 60 }
     ],
     sections: [
       {
-        heading: 'ענייני עולם הבא והשתדלות',
-        description: 'ביטחון בענייני חברה, אמונה במצוות, שכר ועונש, הכרת חסדי ה׳. דיון נרחב בהשתדלות מול ביטחון.',
-        segments: 'פרק ד׳ מ״ו-סוף'
+        heading: 'פרנסה והשתדלות',
+        description: 'ביטחון בפרנסה, היחס בין השתדלות לביטחון, וסוגי ההשתדלות המותרים והאסורים.',
+        segments: 'פרק ד׳ כ״ו-ס׳'
       }
     ],
     topics: [
-      'ביטחון בענייני חברה',
-      'אמונה בתוך קיום המצוות',
-      'שכר ועונש צודק',
-      'הכרת נדיבות ה׳',
-      'גבולות ההשתדלות',
-      'מתי להרבות ומתי למעט בהשתדלות'
+      'ביטחון בפרנסה',
+      'השתדלות מול ביטחון',
+      'סוגי ההשתדלות המותרים',
+      'גבולות הבקשה והתחבולה'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.46?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.26?lang=he'
   },
   {
     day: 6,
     dayName: 'יום שישי',
-    title: 'פרקים ה׳-ו׳',
-    subtitle: 'חיי הבוטח מול חיי מי שאינו בוטח',
+    title: 'סיום פרק ד׳ + פרק ה׳',
+    subtitle: 'ענייני עוה״ב וחיי הבוטח',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5' },
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6' }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 61 },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5' }
     ],
     sections: [
       {
-        heading: 'פרק ה׳ - שבע תכונות של הבוטח בה׳',
-        description: 'חיי האדם שבוטח באמת: שמחה והסתפקות, שלווה, הפיכת עסקי העולם לעבודת ה׳, מידות טובות ויחסים טובים.',
-        segments: 'פרק ה׳'
+        heading: 'סיום פרק ד׳ - ענייני עולם הבא',
+        description: 'ביטחון בענייני חברה, אמונה במצוות, שכר ועונש, והכרת חסדי ה׳.',
+        segments: 'פרק ד׳ ס״א-סוף'
       },
       {
-        heading: 'פרק ו׳ - חיי מי שאינו בוטח',
-        description: 'ביקורת על הרודפים אחר תענוגות העולם ודוחים את עבודת ה׳. שבע סיבות למה דרכם שגויה.',
-        segments: 'פרק ו׳'
+        heading: 'פרק ה׳ - שבע תכונות של הבוטח',
+        description: 'חיי האדם שבוטח באמת: שמחה והסתפקות, שלווה, הפיכת עסקי העולם לעבודת ה׳, מידות טובות.',
+        segments: 'פרק ה׳ (מלא)'
       }
     ],
     topics: [
-      'הסתפקות ושמחה',
-      'שלוות הנפש',
-      'עסקי העולם כעבודת ה׳',
-      'מידות טובות ויחסי אנוש',
-      'חיים ברגע הנוכחי',
-      'הטעות של דחיית עבודת ה׳',
-      'שבע סיבות לטעותם'
+      'ביטחון בענייני חברה',
+      'אמונה בקיום המצוות',
+      'שכר ועונש צודק',
+      'הסתפקות ושמחת הבוטח',
+      'עסקי העולם כעבודת ה׳'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_5.1?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.61?lang=he'
   },
   {
     day: 7,
     dayName: 'שבת',
-    title: 'פרק ז׳',
-    subtitle: 'מכשולים בביטחון ועשר מדרגות הביטחון',
+    title: 'פרקים ו׳-ז׳',
+    subtitle: 'חיי שאינו בוטח + מכשולים ומדרגות',
     sefariaRefs: [
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6' },
       { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7' }
     ],
     sections: [
       {
-        heading: 'פרק ז׳ - מכשולים ומדרגות',
-        description: 'מה פוגם בביטחון: בורות בענייני ה׳, התורה והעולם. עשר מדרגות של ביטחון, עד המדרגה העליונה - השוויון.',
-        segments: 'פרק ז׳'
+        heading: 'פרק ו׳ - חיי מי שאינו בוטח',
+        description: 'ביקורת על הרודפים אחר תענוגות העולם ודוחים את עבודת ה׳. שבע סיבות למה דרכם שגויה.',
+        segments: 'פרק ו׳ (מלא)'
+      },
+      {
+        heading: 'פרק ז׳ - מכשולים ומדרגות הביטחון',
+        description: 'מה פוגם בביטחון, עשר מדרגות של ביטחון, עד המדרגה העליונה - השוויון.',
+        segments: 'פרק ז׳ (מלא)'
       }
     ],
     topics: [
+      'הטעות של דוחי העבודה',
+      'שבע סיבות לטעותם',
       'גורמים הפוגמים בביטחון',
-      'בורות כמכשול',
       'עשר מדרגות הביטחון',
       'המדרגה העליונה - שוויון',
-      'לעולם לא לרצות להיות במצב אחר',
       'סיום וחזרה!'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_7.1?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_6.1?lang=he'
   }
 ];
 
 // === Sefaria Text Fetcher ===
 const TEXT_CACHE_KEY = 'shaar-habitachon-texts';
-const TEXT_CACHE_VERSION = 3; // bumped to invalidate old cache after slicing fix
+const TEXT_CACHE_VERSION = 4; // bumped after rebalancing day splits
 
 function getTextCache() {
   try {
