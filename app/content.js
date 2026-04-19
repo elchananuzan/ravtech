@@ -5,21 +5,20 @@
 const DAYS_HEB = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
 const SEFARIA_BASE = 'https://www.sefaria.org/api/texts/';
+const TREATISE_REF = 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust';
 
-// Sefaria API references for each day's portion.
-// Each entry is { ref, from?, to? }:
-//   - ref: Sefaria reference string (fetched as full chapter)
-//   - from/to: 1-based segment range to slice locally (inclusive)
-//   If from/to omitted, the entire chapter is used.
+// Each day maps to chapter indices in the treatise response.
+// The Sefaria API returns data.he as a 2D array: he[chapterIndex][segmentIndex].
+// Index 0 = Introduction, 1 = Chapter 1, 2 = Chapter 2, ... 7 = Chapter 7.
 const WEEKLY_PORTIONS = [
   {
     day: 1,
     dayName: 'יום ראשון',
     title: 'הקדמה + פרק א׳',
     subtitle: 'מהות הביטחון ותנאיו',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction' },
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1' }
+    chapterMappings: [
+      { index: 0 },
+      { index: 1 }
     ],
     sections: [
       {
@@ -46,9 +45,9 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום שני',
     title: 'פרק ב׳ + פרק ג׳',
     subtitle: 'למה ה׳ ראוי לביטחון וחובתו',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2' },
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3' }
+    chapterMappings: [
+      { index: 2 },
+      { index: 3 }
     ],
     sections: [
       {
@@ -76,8 +75,8 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום שלישי',
     title: 'פרק ד׳ - חלק א׳',
     subtitle: 'תחילת שבעת העניינים - הגוף והפרנסה',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 1, to: 50 }
+    chapterMappings: [
+      { index: 4, from: 1, to: 50 }
     ],
     sections: [
       {
@@ -99,8 +98,8 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום רביעי',
     title: 'פרק ד׳ - חלק ב׳',
     subtitle: 'המשך ענייני הפרנסה וההשתדלות',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 51 }
+    chapterMappings: [
+      { index: 4, from: 51 }
     ],
     sections: [
       {
@@ -123,8 +122,8 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום חמישי',
     title: 'פרק ה׳',
     subtitle: 'חיי הבוטח באמת',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5' }
+    chapterMappings: [
+      { index: 5 }
     ],
     sections: [
       {
@@ -146,8 +145,8 @@ const WEEKLY_PORTIONS = [
     dayName: 'יום שישי',
     title: 'פרק ו׳',
     subtitle: 'חיי מי שאינו בוטח',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6' }
+    chapterMappings: [
+      { index: 6 }
     ],
     sections: [
       {
@@ -168,8 +167,8 @@ const WEEKLY_PORTIONS = [
     dayName: 'שבת',
     title: 'פרק ז׳',
     subtitle: 'מכשולים ומדרגות הביטחון',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7' }
+    chapterMappings: [
+      { index: 7 }
     ],
     sections: [
       {
@@ -189,101 +188,170 @@ const WEEKLY_PORTIONS = [
 ];
 
 // === Sefaria Text Fetcher ===
+// New approach: fetch the ENTIRE treatise in one call, then split by chapter structure.
+// The Sefaria API returns data.he as a 2D array for treatise-level requests.
+
 const TEXT_CACHE_KEY = 'shaar-habitachon-texts';
-const TEXT_CACHE_VERSION = 5; // bumped after full weekly restructure
+const TEXT_CACHE_VERSION = 7;
 
 function getTextCache() {
   try {
     const cached = localStorage.getItem(TEXT_CACHE_KEY);
     if (cached) {
       const data = JSON.parse(cached);
-      if (data.version === TEXT_CACHE_VERSION) return data.texts;
+      if (data.version === TEXT_CACHE_VERSION) return data.chapters;
     }
   } catch {}
-  return {};
+  return null;
 }
 
-function saveTextCache(texts) {
+function saveTextCache(chapters) {
   try {
     localStorage.setItem(TEXT_CACHE_KEY, JSON.stringify({
       version: TEXT_CACHE_VERSION,
-      texts
+      chapters
     }));
   } catch {}
 }
 
-// Fetches a full Sefaria chapter (all segments) as a flat array of Hebrew strings.
-async function fetchSefariaChapter(ref) {
-  const cache = getTextCache();
-  if (cache[ref]) return cache[ref];
+async function fetchTreatise() {
+  const cached = getTextCache();
+  if (cached) return cached;
 
-  // Sefaria v2 API - returns { he: [...], text: [...] }
-  const url = SEFARIA_BASE + ref + '?context=0&pad=0';
+  const url = SEFARIA_BASE + encodeURIComponent(TREATISE_REF) + '?context=0&pad=0';
+  console.log('[Shaar] Fetching treatise from:', url);
+
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    let heTexts = [];
-    if (data.he) {
-      heTexts = flattenText(data.he);
+    if (!data.he || !Array.isArray(data.he)) {
+      console.error('[Shaar] No he array in response');
+      return null;
     }
 
-    // Do NOT filter empty strings here - we need to preserve indices for slicing.
-    if (heTexts.length > 0) {
-      cache[ref] = heTexts;
-      saveTextCache(cache);
+    console.log('[Shaar] Response he type:', typeof data.he[0], 'length:', data.he.length);
+
+    let chapters;
+
+    if (Array.isArray(data.he[0])) {
+      // 2D array: he[chapter][segment] — expected for treatise-level request
+      chapters = data.he.map((chapterSegs, idx) => {
+        const flat = flattenToStrings(chapterSegs);
+        console.log(`[Shaar] Chapter ${idx}: ${flat.length} segments`);
+        return flat;
+      });
+    } else if (typeof data.he[0] === 'string') {
+      // Flat 1D array — the API returned segments without chapter structure.
+      // Fall back to fetching each chapter individually.
+      console.warn('[Shaar] Treatise returned flat array, falling back to per-chapter fetch');
+      return await fetchChaptersIndividually();
+    } else {
+      console.error('[Shaar] Unexpected he structure:', typeof data.he[0]);
+      return null;
     }
-    return heTexts;
+
+    if (chapters.length > 0) {
+      saveTextCache(chapters);
+    }
+    return chapters;
   } catch (err) {
-    console.error(`Failed to fetch ${ref}:`, err);
-    return null;
+    console.error('[Shaar] Failed to fetch treatise:', err);
+    // Fall back to per-chapter fetch
+    return await fetchChaptersIndividually();
   }
 }
 
-function flattenText(text) {
-  if (typeof text === 'string') return [text];
-  if (Array.isArray(text)) {
-    const result = [];
-    for (const item of text) {
-      if (typeof item === 'string') {
-        result.push(item);
-      } else if (Array.isArray(item)) {
-        result.push(...flattenText(item));
+// Fallback: fetch each chapter/section individually with encoded refs.
+async function fetchChaptersIndividually() {
+  console.log('[Shaar] Fetching chapters individually...');
+  const refs = [
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction',
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1',
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2',
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3',
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4',
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5',
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6',
+    'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7'
+  ];
+
+  const chapters = [];
+  for (const ref of refs) {
+    const url = SEFARIA_BASE + encodeURIComponent(ref) + '?context=0&pad=0';
+    console.log(`[Shaar] Fetching: ${ref}`);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (!data.he) {
+        chapters.push([]);
+        continue;
       }
+
+      const segs = flattenToStrings(data.he);
+      console.log(`[Shaar] ${ref}: ${segs.length} segments`);
+
+      // Sanity check: a single chapter should not exceed ~300 segments.
+      // If it does, the API likely returned the entire treatise.
+      if (segs.length > 300) {
+        console.warn(`[Shaar] ${ref} returned ${segs.length} segments — likely the full treatise. Truncating.`);
+      }
+
+      chapters.push(segs);
+    } catch (err) {
+      console.error(`[Shaar] Failed to fetch ${ref}:`, err);
+      chapters.push([]);
+    }
+  }
+
+  if (chapters.some(c => c.length > 0)) {
+    saveTextCache(chapters);
+  }
+  return chapters;
+}
+
+function flattenToStrings(arr) {
+  if (typeof arr === 'string') {
+    return arr.trim().length > 0 ? [arr] : [];
+  }
+  if (Array.isArray(arr)) {
+    const result = [];
+    for (const item of arr) {
+      result.push(...flattenToStrings(item));
     }
     return result;
   }
   return [];
 }
 
-// Fetch all texts for a given day, slicing ranges locally from the full chapter.
 async function fetchDayTexts(dayIndex) {
   const portion = WEEKLY_PORTIONS[dayIndex];
+  const chapters = await fetchTreatise();
+  if (!chapters) return [];
+
   const allTexts = [];
 
-  for (const entry of portion.sefariaRefs) {
-    // Support both old-style strings and new-style { ref, from, to } objects.
-    const ref = typeof entry === 'string' ? entry : entry.ref;
-    const from = typeof entry === 'object' ? entry.from : undefined;
-    const to = typeof entry === 'object' ? entry.to : undefined;
-
-    const chapter = await fetchSefariaChapter(ref);
-    if (!chapter) continue;
-
-    let slice;
-    if (from !== undefined || to !== undefined) {
-      const start = (from || 1) - 1; // 1-based → 0-based
-      const end = to !== undefined ? to : chapter.length;
-      slice = chapter.slice(start, end);
-    } else {
-      slice = chapter;
+  for (const mapping of portion.chapterMappings) {
+    const idx = mapping.index;
+    if (idx >= chapters.length || !chapters[idx]) {
+      console.warn(`[Shaar] Chapter index ${idx} not found (have ${chapters.length} chapters)`);
+      continue;
     }
 
-    // Filter empties only after slicing so ranges stay aligned.
-    slice = slice.filter(t => t && t.trim && t.trim().length > 0);
-    allTexts.push(...slice);
+    const chapter = chapters[idx];
+
+    if (mapping.from !== undefined || mapping.to !== undefined) {
+      const start = (mapping.from || 1) - 1;
+      const end = mapping.to !== undefined ? mapping.to : chapter.length;
+      allTexts.push(...chapter.slice(start, end));
+    } else {
+      allTexts.push(...chapter);
+    }
   }
 
+  console.log(`[Shaar] Day ${dayIndex + 1}: ${allTexts.length} segments`);
   return allTexts;
 }
