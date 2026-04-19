@@ -636,11 +636,36 @@ function init() {
     markDayComplete(getTodayDayIndex());
   });
 
-  // Register service worker
+  // Register service worker and force update check on every load so stale
+  // cache-first SWs from older versions are replaced immediately.
   if ('serviceWorker' in navigator) {
+    // When a new SW takes control, reload once so the page uses the new assets.
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return;
+      reloaded = true;
+      window.location.reload();
+    });
+
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
         console.log('Service Worker registered');
+        // Force a network check for a newer sw.js on every load.
+        reg.update().catch(() => {});
+
+        // If an update is found, the new SW installs then takes over via
+        // skipWaiting + clients.claim, which triggers controllerchange above.
+        reg.addEventListener('updatefound', () => {
+          const sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener('statechange', () => {
+            if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+              // Old caches will be purged in the new SW's activate handler.
+              sw.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        });
+
         // Re-schedule reminder if enabled
         const state = getState();
         if (state.reminderEnabled && reg.active) {
