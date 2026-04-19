@@ -48,6 +48,9 @@ self.addEventListener('fetch', event => {
 
 // Message handler for notifications
 self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
   if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
     scheduleDaily(event.data.hour, event.data.minute);
   }
