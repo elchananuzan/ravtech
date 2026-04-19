@@ -15,198 +15,182 @@ const WEEKLY_PORTIONS = [
   {
     day: 1,
     dayName: 'יום ראשון',
-    title: 'הקדמה - חלק א׳',
-    subtitle: 'מהות הביטחון ומעלותיו',
+    title: 'הקדמה + פרק א׳',
+    subtitle: 'מהות הביטחון ותנאיו',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction', from: 1, to: 23 }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction' },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1' }
     ],
     sections: [
       {
-        heading: 'פתיחה - למה שער הביטחון',
-        description: 'הקדמת רבינו בחיי למהות הביטחון, מדוע בא שער זה אחרי שער עבודת האלוקים, והגדרת הביטחון.',
-        segments: 'הקדמה א׳-כ״ג'
+        heading: 'הקדמה - למה שער הביטחון',
+        description: 'הקדמת רבינו בחיי למהות הביטחון, מעלותיו הרוחניות והגשמיות.',
+        segments: 'הקדמה (מלא)'
+      },
+      {
+        heading: 'פרק א׳ - הגדרת הביטחון',
+        description: 'מהו ביטחון אמיתי: מנוחת נפשו של הבוטח. שש תכונות שצריכות להתקיים במי שבוטחים בו.',
+        segments: 'פרק א׳ (מלא)'
       }
     ],
     topics: [
       'הגדרת הביטחון בה׳',
       'חמש מעלות רוחניות של הביטחון',
       'חמש מעלות גשמיות של הביטחון',
-      'מנוחת הנפש של הבוטח'
+      'שש תכונות הנדרשות ממי שבוטחים בו'
     ],
     sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Introduction.1?lang=he'
   },
   {
     day: 2,
     dayName: 'יום שני',
-    title: 'הקדמה חלק ב׳ + פרק א׳',
-    subtitle: 'תנאי הביטחון והגדרתו',
+    title: 'פרק ב׳ + פרק ג׳',
+    subtitle: 'למה ה׳ ראוי לביטחון וחובתו',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Introduction', from: 24 },
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_1' }
-    ],
-    sections: [
-      {
-        heading: 'סיום ההקדמה',
-        description: 'המשך ההקדמה - תיאור שבעת פרקי השער ותוכנם.',
-        segments: 'הקדמה כ״ד-סוף'
-      },
-      {
-        heading: 'פרק א׳ - הגדרת הביטחון',
-        description: 'מהו ביטחון אמיתי: מנוחת נפשו של הבוטח. ששה תנאים שצריכים להתקיים במי שבוטחים בו.',
-        segments: 'פרק א׳'
-      }
-    ],
-    topics: [
-      'תיאור שבעת הפרקים',
-      'הגדרת הביטחון - מנוחת הנפש',
-      'שש תכונות הנדרשות ממי שבוטחים בו',
-      'רחמנות, השגחה, כוח, ידיעה, שליטה, וחסד'
-    ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Introduction.24?lang=he'
-  },
-  {
-    day: 3,
-    dayName: 'יום שלישי',
-    title: 'פרק ב׳',
-    subtitle: 'שבע תכונות שבהן ה׳ ראוי לביטחון',
-    sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2' }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_2' },
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3' }
     ],
     sections: [
       {
         heading: 'פרק ב׳ - מדוע ה׳ ראוי לביטחון',
-        description: 'הוכחות מהתורה שהקב״ה מקיים את כל ששת התנאים שנמנו בפרק א׳, ועוד יותר מכך.',
+        description: 'הוכחות מהתורה שהקב״ה מקיים את כל ששת התנאים, ועוד יותר מכך.',
         segments: 'פרק ב׳ (מלא)'
+      },
+      {
+        heading: 'פרק ג׳ - חמישה דברים המחייבים ביטחון',
+        description: 'חמישה יסודות המחייבים את האדם לבטוח בה׳: הכרת חסדיו, ידיעתו את המחשבות, ועוד.',
+        segments: 'פרק ג׳ (מלא)'
       }
     ],
     topics: [
       'ה׳ רחמן ומשגיח',
-      'כוחו ית׳ וידיעתו',
-      'שליטתו המוחלטת',
+      'כוחו ית׳, ידיעתו ושליטתו',
       'חסדו אף למי שאינו ראוי',
-      'הסיבה העליונה לכל דבר'
+      'חמישה יסודות המחייבים ביטחון',
+      'הכרת חסדי ה׳'
     ],
     sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_2.1?lang=he'
   },
   {
-    day: 4,
-    dayName: 'יום רביעי',
-    title: 'פרק ג׳ + תחילת פרק ד׳',
-    subtitle: 'חובת הביטחון ופתיחת שבעת העניינים',
+    day: 3,
+    dayName: 'יום שלישי',
+    title: 'פרק ד׳ - חלק א׳',
+    subtitle: 'תחילת שבעת העניינים - הגוף והפרנסה',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_3' },
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 1, to: 25 }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 1, to: 50 }
     ],
     sections: [
       {
-        heading: 'פרק ג׳ - חמישה דברים המחייבים ביטחון בה׳',
-        description: 'חמישה יסודות: הכרת חסדי ה׳, ידיעתו את מחשבותינו, ביטחון אמיתי, שילוב אמונה עם עבודה, והשתדלות מול ביטחון.',
-        segments: 'פרק ג׳ (מלא)'
-      },
-      {
-        heading: 'פתיחת פרק ד׳ - ענייני הגוף',
-        description: 'התחלת שבעת העניינים שצריך לבטוח בה׳ - ביטחון בענייני בריאות הגוף וחיי האדם.',
-        segments: 'פרק ד׳ א׳-כ״ה'
+        heading: 'פרק ד׳ א׳-נ׳',
+        description: 'התחלת שבעת העניינים שצריך לבטוח בה׳ - ענייני בריאות הגוף, חיי האדם והתחלת ענייני הפרנסה.',
+        segments: 'פרק ד׳ א׳-נ׳'
       }
     ],
     topics: [
-      'חמישה יסודות המחייבים ביטחון',
-      'הכרת חסדי ה׳',
-      'ידיעתו את המחשבות',
-      'פתיחת שבעת העניינים',
-      'ביטחון בענייני הגוף'
+      'שבעת עניינים שצריך לבטוח בה׳',
+      'ביטחון בענייני הגוף',
+      'ביטחון בחיי האדם',
+      'פתיחת ענייני הפרנסה'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_3.1?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.1?lang=he'
   },
   {
-    day: 5,
-    dayName: 'יום חמישי',
+    day: 4,
+    dayName: 'יום רביעי',
     title: 'פרק ד׳ - חלק ב׳',
-    subtitle: 'המשך ענייני הגוף והפרנסה',
+    subtitle: 'המשך ענייני הפרנסה וההשתדלות',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 26, to: 60 }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 51 }
     ],
     sections: [
       {
-        heading: 'פרנסה והשתדלות',
-        description: 'ביטחון בפרנסה, היחס בין השתדלות לביטחון, וסוגי ההשתדלות המותרים והאסורים.',
-        segments: 'פרק ד׳ כ״ו-ס׳'
+        heading: 'פרק ד׳ נ״א-סוף',
+        description: 'המשך ענייני הפרנסה, היחס בין השתדלות לביטחון, סוגי ההשתדלות, ענייני חברה וענייני עוה״ב.',
+        segments: 'פרק ד׳ נ״א-סוף'
       }
     ],
     topics: [
       'ביטחון בפרנסה',
       'השתדלות מול ביטחון',
-      'סוגי ההשתדלות המותרים',
-      'גבולות הבקשה והתחבולה'
+      'גבולות ההשתדלות המותרת',
+      'ביטחון בענייני חברה',
+      'ביטחון בענייני עולם הבא'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.26?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.51?lang=he'
   },
   {
-    day: 6,
-    dayName: 'יום שישי',
-    title: 'סיום פרק ד׳ + פרק ה׳',
-    subtitle: 'ענייני עוה״ב וחיי הבוטח',
+    day: 5,
+    dayName: 'יום חמישי',
+    title: 'פרק ה׳',
+    subtitle: 'חיי הבוטח באמת',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_4', from: 61 },
       { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_5' }
     ],
     sections: [
       {
-        heading: 'סיום פרק ד׳ - ענייני עולם הבא',
-        description: 'ביטחון בענייני חברה, אמונה במצוות, שכר ועונש, והכרת חסדי ה׳.',
-        segments: 'פרק ד׳ ס״א-סוף'
-      },
-      {
-        heading: 'פרק ה׳ - שבע תכונות של הבוטח',
-        description: 'חיי האדם שבוטח באמת: שמחה והסתפקות, שלווה, הפיכת עסקי העולם לעבודת ה׳, מידות טובות.',
+        heading: 'פרק ה׳ - תכונות הבוטח',
+        description: 'חיי האדם הבוטח: שמחה והסתפקות, שלווה, הפיכת עסקי העולם לעבודת ה׳, מידות טובות.',
         segments: 'פרק ה׳ (מלא)'
       }
     ],
     topics: [
-      'ביטחון בענייני חברה',
-      'אמונה בקיום המצוות',
-      'שכר ועונש צודק',
-      'הסתפקות ושמחת הבוטח',
-      'עסקי העולם כעבודת ה׳'
+      'שמחת והסתפקות הבוטח',
+      'שלוות הנפש',
+      'עסקי העולם כעבודת ה׳',
+      'מידות טובות של הבוטח'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_4.61?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_5.1?lang=he'
   },
   {
-    day: 7,
-    dayName: 'שבת',
-    title: 'פרקים ו׳-ז׳',
-    subtitle: 'חיי שאינו בוטח + מכשולים ומדרגות',
+    day: 6,
+    dayName: 'יום שישי',
+    title: 'פרק ו׳',
+    subtitle: 'חיי מי שאינו בוטח',
     sefariaRefs: [
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6' },
-      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7' }
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_6' }
     ],
     sections: [
       {
-        heading: 'פרק ו׳ - חיי מי שאינו בוטח',
+        heading: 'פרק ו׳ - ביקורת דוחי העבודה',
         description: 'ביקורת על הרודפים אחר תענוגות העולם ודוחים את עבודת ה׳. שבע סיבות למה דרכם שגויה.',
         segments: 'פרק ו׳ (מלא)'
-      },
-      {
-        heading: 'פרק ז׳ - מכשולים ומדרגות הביטחון',
-        description: 'מה פוגם בביטחון, עשר מדרגות של ביטחון, עד המדרגה העליונה - השוויון.',
-        segments: 'פרק ז׳ (מלא)'
       }
     ],
     topics: [
       'הטעות של דוחי העבודה',
       'שבע סיבות לטעותם',
+      'תענוגות העולם מול עבודת ה׳'
+    ],
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_6.1?lang=he'
+  },
+  {
+    day: 7,
+    dayName: 'שבת',
+    title: 'פרק ז׳',
+    subtitle: 'מכשולים ומדרגות הביטחון',
+    sefariaRefs: [
+      { ref: 'Duties_of_the_Heart,_Fourth_Treatise_on_Trust,_Chapter_7' }
+    ],
+    sections: [
+      {
+        heading: 'פרק ז׳ - מכשולים ומדרגות',
+        description: 'מה פוגם בביטחון, עשר מדרגות של ביטחון, עד המדרגה העליונה - השוויון.',
+        segments: 'פרק ז׳ (מלא)'
+      }
+    ],
+    topics: [
       'גורמים הפוגמים בביטחון',
       'עשר מדרגות הביטחון',
       'המדרגה העליונה - שוויון',
       'סיום וחזרה!'
     ],
-    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_6.1?lang=he'
+    sefariaUrl: 'https://www.sefaria.org/Duties_of_the_Heart%2C_Fourth_Treatise_on_Trust%2C_Chapter_7.1?lang=he'
   }
 ];
 
 // === Sefaria Text Fetcher ===
 const TEXT_CACHE_KEY = 'shaar-habitachon-texts';
-const TEXT_CACHE_VERSION = 4; // bumped after rebalancing day splits
+const TEXT_CACHE_VERSION = 5; // bumped after full weekly restructure
 
 function getTextCache() {
   try {
