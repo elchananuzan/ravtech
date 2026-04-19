@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shaar-habitachon-v4';
+const CACHE_NAME = 'shaar-habitachon-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -27,11 +27,22 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch - serve from cache, fallback to network
+// Fetch - network-first for app shell so updates are picked up immediately;
+// fall back to cache when offline. Previously used cache-first which caused
+// the installed PWA to keep serving stale content.js forever.
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    fetch(event.request)
+      .then(res => {
+        // Only cache same-origin successful responses.
+        if (res && res.ok && new URL(event.request.url).origin === self.location.origin) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
 
